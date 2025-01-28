@@ -1,41 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="/static/css/dashboard.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <title>Dashboard de Medições</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medições</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 </head>
 <body>
     <h1>Dashboard de Medições</h1>
-    <form method="get" id="formulario-filtro" class="filter-form">
-        <label for="agente">Agente:</label>
-        <select name="agente" id="agente">
-            <option value="">Todos</option>
-            {% for agente in agentes %}
-            <option value="{{ agente }}">{{ agente }}</option>
-            {% endfor %}
-        </select>
-        <label for="ponto_grupo">Ponto Grupo:</label>
-        <select name="ponto_grupo" id="ponto_grupo">
-            <option value="">Todos</option>
-            {% for ponto in pontos_grupo %}
-            <option value="{{ ponto }}">{{ ponto }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Filtrar</button>
-    </form>
-    <table>
+    <a href="/">Voltar para Home</a>
+    <table border="1">
         <thead>
             <tr>
                 <th>Agente</th>
                 <th>Ponto Grupo</th>
                 <th>Data</th>
                 <th>Hora</th>
-                <th>Ativa C</th>
+                <th>Ativa (kWh)</th>
             </tr>
         </thead>
         <tbody>
-            {% for medicao in medições %}
+            {% for medicao in medicoes %}
             <tr>
                 <td>{{ medicao.agente }}</td>
                 <td>{{ medicao.ponto_grupo }}</td>
@@ -46,5 +31,20 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Paginação -->
+    <div class="pagination">
+        {% if page > 1 %}
+            <a href="{{ url_for('medicoes_dashboard', page=1) }}">Primeira</a>
+            <a href="{{ url_for('medicoes_dashboard', page=page-1) }}">Anterior</a>
+        {% endif %}
+
+        <span>Página {{ page }} de {{ total_pages }}</span>
+
+        {% if page < total_pages %}
+            <a href="{{ url_for('medicoes_dashboard', page=page+1) }}">Próxima</a>
+            <a href="{{ url_for('medicoes_dashboard', page=total_pages) }}">Última</a>
+        {% endif %}
+    </div>
 </body>
 </html>
