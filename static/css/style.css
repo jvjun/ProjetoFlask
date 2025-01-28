@@ -1,0 +1,62 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to right, #003f7d, #ffffff); /* Azul para branco */
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+h1 {
+    font-size: 3rem;
+    color: #003f7d; /* Azul do logotipo */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+a {
+    display: inline-block;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+    background: #ff6f00; /* Laranja da marca */
+    border-radius: 25px;
+    box-shadow: 0 5px 15px rgba(255, 111, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    background: #cc5800; /* Tom mais escuro de laranja */
+    box-shadow: 0 8px 20px rgba(255, 111, 0, 0.6);
+    transform: translateY(-3px);
+}
+
+/* Estrutura do layout principal */
+.container {
+    text-align: center;
+    padding: 20px;
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+footer {
+    margin-top: 500px;
+    font-size: 0.9rem;
+    color: #fff;
+    margin-left: 20px;
+}
+
+footer a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+footer a:hover {
+    color: #ddd;
+}
