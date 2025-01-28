@@ -1,29 +1,27 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
-# Configuração da aplicação Flask
 app = Flask(__name__)
 
-# Configuração do banco de dados
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:*Back1245@127.0.0.1:3306/medicao'
+# Configuração do banco de dados (Railway)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Inicializar o SQLAlchemy
 db = SQLAlchemy(app)
 
-# Modelo da tabela 'medicao'
+# Modelo do Banco
 class Medicao(db.Model):
     __tablename__ = 'medicao'
 
     id = db.Column(db.Integer, primary_key=True)
-    agente = db.Column(db.String(100), nullable=False)
-    ponto_grupo = db.Column(db.String(100), nullable=False)
-    data = db.Column(db.Date, nullable=False)
-    hora = db.Column(db.Time, nullable=False)
-    ativa_c = db.Column(db.Float, nullable=False)
-    qualidade = db.Column(db.String(50), nullable=False)
-    origem = db.Column(db.String(50), nullable=False)
-    timestamp = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+    agente = db.Column(db.String(100))
+    ponto_grupo = db.Column(db.String(100))
+    data = db.Column(db.Date)
+    hora = db.Column(db.Time)
+    ativa_c = db.Column(db.Float)
+    qualidade = db.Column(db.String(50))
+    origem = db.Column(db.String(50))
+    timestamp = db.Column(db.DateTime)
 
 # Rota inicial para renderizar a página Home
 @app.route('/')
