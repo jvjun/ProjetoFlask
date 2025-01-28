@@ -1,11 +1,12 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request
 import os
 
 app = Flask(__name__)
 
 # Configuração do banco de dados (Railway)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{os.getenv('MYSQLUSER')}:{os.getenv('MYSQLPASSWORD')}@{os.getenv('MYSQLHOST')}:{os.getenv('MYSQLPORT')}/{os.getenv('MYSQLDATABASE')}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
