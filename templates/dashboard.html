@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+    <div class="container-dashboard">
+        <h1>Dashboard de Medições</h1>
+        <form method="POST">
+            <input type="text" name="agente" placeholder="Agente" required>
+            <input type="text" name="ponto_grupo" placeholder="Ponto/Grupo" required>
+            <input type="date" name="data" required>
+            <input type="time" name="hora" required>
+            <input type="number" step="0.01" name="ativa_c" placeholder="Ativa (kWh)" required>
+            <input type="text" name="qualidade" placeholder="Qualidade" required>
+            <input type="text" name="origem" placeholder="Origem" required>
+            <button type="submit">Salvar Medição</button>
+        </form>
+
+        <h2>Suas Medições</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Agente</th>
+                <th>Ponto/Grupo</th>
+                <th>Data</th>
+                <th>Hora</th>
+                <th>Ativa (kWh)</th>
+                <th>Qualidade</th>
+                <th>Origem</th>
+            </tr>
+            {% for dado in dados %}
+            <tr>
+                <td>{{ dado.id }}</td>
+                <td>{{ dado.agente }}</td>
+                <td>{{ dado.ponto_grupo }}</td>
+                <td>{{ dado.data }}</td>
+                <td>{{ dado.hora }}</td>
+                <td>{{ dado.ativa_c }}</td>
+                <td>{{ dado.qualidade }}</td>
+                <td>{{ dado.origem }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a href="/logout">Logout</a>
+    </div>
+</body>
+</html>
