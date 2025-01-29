@@ -1,12 +1,11 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, request
 import os
 
 app = Flask(__name__)
 
-# Configuração do banco de dados (Railway)
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{os.getenv('MYSQLUSER')}:{os.getenv('MYSQLPASSWORD')}@{os.getenv('MYSQLHOST')}:{os.getenv('MYSQLPORT')}/{os.getenv('MYSQLDATABASE')}"
+# Configurar PostgreSQL do Render
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')  # Configuração com variável de ambiente
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -25,6 +24,14 @@ class Medicao(db.Model):
     origem = db.Column(db.String(50))
     timestamp = db.Column(db.DateTime)
 
+# Criar tabelas no banco de dados (caso ainda não existam)
+with app.app_context():
+    try:
+        db.create_all()
+        print("Banco de dados conectado com sucesso! ✅")
+    except Exception as e:
+        print(f"Erro ao conectar ao banco de dados: {e}")
+
 # Rota inicial para renderizar a página Home
 @app.route('/')
 def home():
@@ -33,7 +40,6 @@ def home():
 # Rota para a página Medições
 @app.route('/medicoes_dashboard')
 def medicoes_dashboard():
-    # Obtendo o número da página a partir dos parâmetros da URL
     page = request.args.get('page', 1, type=int)  # Página padrão é 1
     per_page = 50  # Quantidade de registros por página
 
@@ -69,4 +75,4 @@ def listar_medicoes_api():
 
 # Inicializar o servidor Flask
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=int(os.getenv("PORT", 5000)))
