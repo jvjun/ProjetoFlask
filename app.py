@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from functools import wraps
 import os
 
 app = Flask(__name__)
@@ -13,9 +14,19 @@ app.secret_key = 'sua_chave_secreta'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
+# Decorator para verificar autenticação
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:  # Verifica se o usuário está logado
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 # Modelo do Banco de Dados
 class Medicao(db.Model):
     __tablename__ = 'medicao'
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)  # FK para usuários
     agente = db.Column(db.String(100))
     ponto_grupo = db.Column(db.String(100))
@@ -39,11 +50,12 @@ with app.app_context():
     except Exception as e:
         print(f"Erro ao conectar ao banco de dados: {e}")
 
-# Rota inicial para renderizar a página de login
+# Rota inicial para redirecionar ao login
 @app.route('/')
 def login_redirect():
     return redirect(url_for('login'))
 
+# Rota de login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -51,11 +63,12 @@ def login():
         password = request.form['password']
         usuario = Usuario.query.filter_by(username=username).first()
         if usuario and bcrypt.check_password_hash(usuario.password, password):
-            session['user_id'] = usuario.id
+            session['user_id'] = usuario.id  # Salva o ID do usuário na sessão
             return redirect(url_for('home'))
         return "Usuário ou senha inválidos!", 400
     return render_template('login.html')
 
+# Rota de registro
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -69,16 +82,16 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html')
 
+# Rota para a página inicial (Home)
 @app.route('/home')
+@login_required
 def home():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
     return render_template('home.html')
 
+# Rota para o dashboard de medições
 @app.route('/medicoes_dashboard')
+@login_required
 def medicoes_dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
     page = request.args.get('page', 1, type=int)
     per_page = 50
     paginacao = Medicao.query.filter_by(user_id=session['user_id']).paginate(page=page, per_page=per_page)
@@ -89,13 +102,21 @@ def medicoes_dashboard():
         total_pages=paginacao.pages
     )
 
+# Rota de logout
+@app.route('/logout')
+@login_required
+def logout():
+    session.clear()  # Limpa a sessão
+    return redirect(url_for('login'))
+
 # API para listar medições
 @app.route('/api/medicoes', methods=['GET'])
+@login_required
 def listar_medicoes_api():
-    medicoes = Medicao.query.all()
+    medicoes = Medicao.query.filter_by(user_id=session['user_id']).all()
     resultado = [
         {
-            "user_id": medicao.user_id,
+            "id": medicao.id,
             "agente": medicao.agente,
             "ponto_grupo": medicao.ponto_grupo,
             "data": medicao.data.strftime('%Y-%m-%d'),
