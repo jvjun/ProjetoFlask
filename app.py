@@ -1,19 +1,24 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from flask_session import Session  # 🔹 Adicionamos o Flask-Session
 from functools import wraps
 import os
 
 app = Flask(__name__)
 
 # Configurações do aplicativo
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'uma_chave_super_secreta')  # 🔹 Use uma chave forte
+app.config['SESSION_TYPE'] = 'filesystem'  # 🔹 Armazena a sessão no sistema de arquivos
+app.config['SESSION_PERMANENT'] = False  # 🔹 Sessão não é permanente
+app.config['SESSION_USE_SIGNER'] = True  # 🔹 Assina a sessão para maior segurança
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')  # Configuração do PostgreSQL no Render
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'sua_chave_secreta'  # Altere para uma chave mais segura em produção
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-
+Session(app)  # 🔹 Inicializa a sessão com Flask-Session
 # Decorador para verificar autenticação
 def login_required(f):
     @wraps(f)
