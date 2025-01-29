@@ -7,35 +7,34 @@ import os
 app = Flask(__name__)
 
 # Configurações do aplicativo
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')  # Configuração do PostgreSQL no Render
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'sua_chave_secreta'
+app.secret_key = 'sua_chave_secreta'  # Altere para uma chave mais segura em produção
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-# Decorator para verificar autenticação
+# Decorador para verificar autenticação
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:  # Verifica se o usuário está logado
-            return redirect(url_for('login'))
+            return redirect(url_for('login'))  # Redireciona para a página de login
         return f(*args, **kwargs)
     return decorated_function
 
-# Modelo do Banco de Dados
+# Modelo da tabela Medicao
 class Medicao(db.Model):
     __tablename__ = 'medicao'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)  # FK para usuários
-    agente = db.Column(db.String(100))
-    ponto_grupo = db.Column(db.String(100))
-    data = db.Column(db.Date)
-    hora = db.Column(db.Time)
+    agente = db.Column(db.String(100), primary_key=True)
+    ponto_grupo = db.Column(db.String(100), primary_key=True)
+    data = db.Column(db.Date, primary_key=True)
+    hora = db.Column(db.Time, primary_key=True)
     ativa_c = db.Column(db.Float)
     qualidade = db.Column(db.String(50))
-    timestamp = db.Column(db.DateTime, default=db.func.now())  # Data/hora de criação
+    timestamp = db.Column(db.DateTime, default=db.func.now())
 
+# Modelo da tabela Usuario
 class Usuario(db.Model):
     __tablename__ = 'usuarios'
     id = db.Column(db.Integer, primary_key=True)
@@ -55,7 +54,7 @@ with app.app_context():
 def login_redirect():
     return redirect(url_for('login'))
 
-# Rota de login
+# Rota para login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -68,7 +67,7 @@ def login():
         return "Usuário ou senha inválidos!", 400
     return render_template('login.html')
 
-# Rota de registro
+# Rota para registro
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -82,7 +81,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html')
 
-# Rota para a página inicial (Home)
+# Rota para a página inicial
 @app.route('/home')
 @login_required
 def home():
@@ -94,7 +93,7 @@ def home():
 def medicoes_dashboard():
     page = request.args.get('page', 1, type=int)
     per_page = 50
-    paginacao = Medicao.query.filter_by(user_id=session['user_id']).paginate(page=page, per_page=per_page)
+    paginacao = Medicao.query.paginate(page=page, per_page=50)
     return render_template(
         'medicoes_dashboard.html',
         medicoes=paginacao.items,
@@ -102,21 +101,13 @@ def medicoes_dashboard():
         total_pages=paginacao.pages
     )
 
-# Rota de logout
-@app.route('/logout')
-@login_required
-def logout():
-    session.clear()  # Limpa a sessão
-    return redirect(url_for('login'))
-
 # API para listar medições
 @app.route('/api/medicoes', methods=['GET'])
 @login_required
 def listar_medicoes_api():
-    medicoes = Medicao.query.filter_by(user_id=session['user_id']).all()
+    medicoes = Medicao.query.all()
     resultado = [
         {
-            "id": medicao.id,
             "agente": medicao.agente,
             "ponto_grupo": medicao.ponto_grupo,
             "data": medicao.data.strftime('%Y-%m-%d'),
@@ -128,6 +119,13 @@ def listar_medicoes_api():
         for medicao in medicoes
     ]
     return jsonify(resultado), 200
+
+# Rota para logout
+@app.route('/logout')
+@login_required
+def logout():
+    session.pop('user_id', None)  # Remove o usuário da sessão
+    return redirect(url_for('login'))
 
 # Inicializar o servidor Flask
 if __name__ == '__main__':
