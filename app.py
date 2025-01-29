@@ -18,8 +18,8 @@ bcrypt = Bcrypt(app)
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:  # Verifica se o usuário está logado
-            return redirect(url_for('login'))  # Redireciona para a página de login
+        if 'user_id' not in session or session['user_id'] is None:
+            return redirect(url_for('login'))  # Redireciona para login se não estiver logado
         return f(*args, **kwargs)
     return decorated_function
 
