@@ -24,9 +24,12 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session or session['user_id'] is None:
-            return redirect(url_for('login'))  # Redireciona para login se não estiver logado
+            print("🔴 Usuário não autenticado! Redirecionando para login.")
+            return redirect(url_for('login'))
+        print("✅ Usuário autenticado:", session['user_id'])
         return f(*args, **kwargs)
     return decorated_function
+
 
 # Modelo da tabela Medicao
 class Medicao(db.Model):
