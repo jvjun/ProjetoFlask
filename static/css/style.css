@@ -11,22 +11,35 @@ body {
     height: 100vh;
 }
 
-/* 🔹 Estrutura do layout principal */
-.container {
+/* 🔹 Container da Página de Login */
+.login-container {
     text-align: center;
     padding: 30px;
     max-width: 400px;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 15px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-in-out;
 }
 
-/* 🔹 Títulos */
+/* 🔹 Animação Suave */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 🔹 Título */
 h1 {
-    font-size: 2.5rem;
-    color: #003f7d; /* Azul do logotipo */
+    font-size: 2rem;
+    color: #003f7d; /* Azul principal */
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 /* 🔹 Formulário */
@@ -36,10 +49,10 @@ form {
     gap: 15px;
 }
 
-input[type="text"],
+/* 🔹 Campos de Entrada */
 input[type="password"] {
-    width: 100%;
-    padding: 15px;
+    width: 85%;
+    padding: 12px;
     border: 2px solid #ddd;
     border-radius: 5px;
     font-size: 16px;
@@ -48,7 +61,7 @@ input[type="password"] {
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* 🔹 Foco nos Inputs */
+/* 🔹 Foco no Campo de Senha */
 input:focus {
     border-color: #ff6f00;
     outline: none;
@@ -60,7 +73,7 @@ input:focus {
 button {
     background-color: #ff6f00;
     color: white;
-    padding: 15px;
+    padding: 12px;
     font-size: 18px;
     border: none;
     border-radius: 5px;
@@ -79,18 +92,20 @@ button:active {
     transform: scale(0.98); /* Efeito de clique */
 }
 
-/* 🔹 Links */
-a {
-    text-decoration: none;
-    color: #ff6f00;
+/* 🔹 Mensagem de Erro */
+.error-message {
+    color: red;
     font-size: 14px;
-    font-weight: bold;
-    transition: color 0.3s ease-in-out;
+    margin-top: -10px;
+    animation: shake 0.3s ease-in-out;
 }
 
-a:hover {
-    text-decoration: underline;
-    color: #cc5800;
+/* 🔹 Animação de Erro (Tremer) */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
 }
 
 /* 🔹 Rodapé */
@@ -115,22 +130,22 @@ footer a:hover {
 
 /* 🔹 Ajuste Responsivo */
 @media (max-width: 600px) {
-    .container {
+    .login-container {
         max-width: 90%;
         padding: 20px;
     }
 
     h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
     button {
         font-size: 16px;
-        padding: 12px;
+        padding: 10px;
     }
 
     input {
-        padding: 12px;
+        padding: 10px;
         font-size: 14px;
     }
 }

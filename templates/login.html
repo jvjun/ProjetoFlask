@@ -1,18 +1,24 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <title>Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <h1>Login</h1>
+    <html lang="pt">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <title>Acesso Restrito</title>
+    </head>
+    <body>
+        <h2>🔐 Insira a Senha para Acessar</h2>
+        <p></p>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <p style="color: red;">{{ messages[0] }}</p>
+            {% endif %}
+        {% endwith %}
+    
         <form method="POST">
-            <input type="text" name="username" placeholder="Usuário" required>
-            <input type="password" name="password" placeholder="Senha" required>
+            <input type="password" name="senha" placeholder="Digite a senha" required>
             <button type="submit">Entrar</button>
         </form>
-        <p>Não tem uma conta? <a href="/register">Registre-se aqui</a></p>
-    </div>
-</body>
-</html>
+    </body>
+    </html>
+    
