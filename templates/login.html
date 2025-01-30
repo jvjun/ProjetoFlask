@@ -1,23 +1,26 @@
 <!DOCTYPE html>
-    <html lang="pt">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-        <title>Acesso Restrito</title>
-    </head>
-    <body>
-        <h2>🔐 Insira a Senha para Acessar</h2>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Acesso Restrito</title>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login</h1>
+
+        <!-- Exibir mensagem de erro como popup -->
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <p style="color: red;">{{ messages[0] }}</p>
+                <div class="error-popup">{{ messages[0] }}</div>
             {% endif %}
         {% endwith %}
-    
+
         <form method="POST">
             <input type="password" name="senha" placeholder="Digite a senha" required>
             <button type="submit">Entrar</button>
         </form>
-    </body>
-    </html>
-    
+    </div>
+</body>
+</html>
