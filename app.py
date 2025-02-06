@@ -3,6 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 import os
 from dotenv import load_dotenv
+import requests
+from flask import Response
+from config import Config
 
 # 🔹 Carregar variáveis do .env
 load_dotenv()
@@ -27,21 +30,10 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not request.cookies.get('user_id'):  # 🔹 Se o cookie 'user_id' não existir, redireciona para login
-            flash("⚠ Você precisa fazer login para acessar esta página.", "warning")
+            flash("⚠  Insira a senha correta para acessar esta página.", "warning")
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
-
-# 🔹 Modelo da tabela Medicao
-class Medicao(db.Model):
-    __tablename__ = 'medicao'
-    agente = db.Column(db.String(100), primary_key=True)
-    ponto_grupo = db.Column(db.String(100), primary_key=True)
-    data = db.Column(db.Date, primary_key=True)
-    hora = db.Column(db.Time, primary_key=True)
-    ativa_c = db.Column(db.Float)
-    qualidade = db.Column(db.String(50))
-    timestamp = db.Column(db.DateTime, default=db.func.now())
 
 # 🔹 Página de login única com senha fixa
 @app.route("/", methods=["GET", "POST"])
@@ -66,41 +58,38 @@ def login():
 def home():
     return render_template("home.html")
 
-# 🔹 Rota para o dashboard de medições (Protegida)
-@app.route("/medicoes_dashboard")
+# 🔹 Rota da página protegida do Power BI
+@app.route("/dashboard_powerbi")
 @login_required
-def medicoes_dashboard():
-    page = request.args.get("page", 1, type=int)  
-    per_page = 50  
+def dashboard_powerbi():
+    return render_template("dashboard_powerbi.html")  # 🔹 Removemos a passagem direta da URL
 
-    # 🔹 Consulta paginada no banco de dados
-    paginacao = Medicao.query.paginate(page=page, per_page=per_page, error_out=False)
+@app.route("/proxy_powerbi")
+def proxy_powerbi():
+    power_bi_url = os.getenv("POWER_BI_URL")
+    headers = {"User-Agent": "Mozilla/5.0"}  # Simula um navegador
+    try:
+        response = requests.get(power_bi_url, headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        # Adicione cabeçalhos de CORS para permitir recursos externos
+        proxied_response = Response(response.content, content_type=response.headers.get('Content-Type'))
+        proxied_response.headers["Access-Control-Allow-Origin"] = "*"
+        proxied_response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+        proxied_response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        return proxied_response
+    except requests.exceptions.RequestException as e:
+        return f"Erro ao carregar o dashboard: {e}", 500
 
-    return render_template(
-        "medicoes_dashboard.html",
-        medicoes=paginacao.items,
-        page=page,
-        total_pages=paginacao.pages
-    )
-
-# 🔹 API para listar medições (Protegida)
-@app.route("/api/medicoes", methods=["GET"])
+# 🔹 API segura para retornar a URL do Power BI
+@app.route("/get_powerbi_url", methods=["GET"])
 @login_required
-def listar_medicoes_api():
-    medicoes = Medicao.query.all()
-    resultado = [
-        {
-            "agente": medicao.agente,
-            "ponto_grupo": medicao.ponto_grupo,
-            "data": medicao.data.strftime('%Y-%m-%d'),
-            "hora": medicao.hora.strftime('%H:%M:%S'),
-            "ativa_c": medicao.ativa_c,
-            "qualidade": medicao.qualidade,
-            "timestamp": medicao.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-        }
-        for medicao in medicoes
-    ]
-    return jsonify(resultado), 200
+def get_powerbi_url():
+    powerbi_url = Config.POWER_BI_URL
+    if not powerbi_url:
+        return jsonify({"error": "⚠ O link do Power BI não foi configurado."}), 500
+
+    return jsonify({"url": powerbi_url})  # 🔹 Envia a URL de forma segura
 
 # 🔹 Rota para logout
 @app.route("/logout")

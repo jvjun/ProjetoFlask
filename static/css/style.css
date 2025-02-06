@@ -218,3 +218,85 @@ form {
     align-items: center;
     gap: 15px;
 }
+
+/* 🔹 Container do Dashboard Power BI */
+.dashboard-container {
+    width: 90%;
+    max-width: 1200px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* 🔹 Título */
+.dashboard-container h1 {
+    font-size: 2rem;
+    color: #003f7d; /* Azul principal */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+}
+
+/* 🔹 Estilização do Iframe */
+.dashboard-iframe {
+    width: 100%;
+    height: 600px;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+}
+
+/* 🔹 Efeito ao passar o mouse */
+.dashboard-iframe:hover {
+    transform: scale(1.01);
+}
+
+/* 🔹 Botão de Acesso ao Dashboard */
+.dashboard-btn {
+    display: inline-block;
+    background-color: #ff6f00;
+    color: white;
+    padding: 12px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.dashboard-btn:hover {
+    background-color: #cc5800;
+    box-shadow: 0 5px 10px rgba(255, 111, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+/* 🔹 Ajuste Responsivo */
+@media (max-width: 800px) {
+    .dashboard-container {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .dashboard-container h1 {
+        font-size: 1.5rem;
+    }
+
+    .dashboard-iframe {
+        height: 400px;
+    }
+}
+
+/* 🔹 Animação Suave */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Power BI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- 🔹 Barra de Navegação -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <h2 class="navbar-logo">Dashboard Power BI</h2>
+            <a href="/logout" class="logout-btn">Sair</a>
+        </div>
+    </nav>
+
+    <!-- 🔹 Container do Dashboard -->
+    <div class="dashboard-container">
+        <h1>Visualização do Power BI</h1>
+        <p class="loading-text">Carregando o dashboard, aguarde...</p>
+
+        <!-- 🔹 Iframe do Power BI -->
+        <iframe id="powerbi-frame" class="dashboard-iframe" src="/proxy_powerbi" title="Dashboard do Power BI"></iframe>
+    </div>
+
+</body>
+</html>
