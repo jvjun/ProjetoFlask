@@ -1,50 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medições</title>
+    <title>Dashboard de Medições - ANEEL</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/medicoes_dashboard.css') }}">
 </head>
+
 <body>
-    <h1>Dashboard de Medições</h1>
-    <a href="/">Voltar para Home</a>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Agente</th>
-                <th>Ponto Grupo</th>
-                <th>Data</th>
-                <th>Hora</th>
-                <th>Ativa (kWh)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for medicao in medicoes %}
-            <tr>
-                <td>{{ medicao.agente }}</td>
-                <td>{{ medicao.ponto_grupo }}</td>
-                <td>{{ medicao.data }}</td>
-                <td>{{ medicao.hora }}</td>
-                <td>{{ medicao.ativa_c }}</td>
-            </tr>
+    <div class="container">
+        <h1>Dashboard de Medições - API ANEEL</h1>
+        <a href="/" class="btn-home">Voltar para Home</a>
+
+        <!-- 🗂️ Filtros por Categorias -->
+        <form method="GET" action="{{ url_for('medicoes_dashboard') }}" class="filter-container">
+            {% for key, options in dropdown_options.items() %}
+                    <div class="filter-group">
+                        <label for="{{ key }}">{{ key.replace('_', ' ') }}</label>
+                        <select id="{{ key }}" name="{{ key }}" onchange="this.form.submit()">
+                            {% for option in options %}
+                                <option value="{{ option }}" {% if filters[key] == option %}selected{% endif %}>
+                                    {{ option }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
             {% endfor %}
-        </tbody>
-    </table>
+        </form>
 
-    <!-- Paginação -->
-    <div class="pagination">
-        {% if page > 1 %}
-            <a href="{{ url_for('medicoes_dashboard', page=1) }}">Primeira</a>
-            <a href="{{ url_for('medicoes_dashboard', page=page-1) }}">Anterior</a>
-        {% endif %}
+        <!-- 📋 Tabela de Dados -->
+        <div class="table-container">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Data Geração</th>
+                        <th>Resolução</th>
+                        <th>Agente</th>
+                        <th>CNPJ</th>
+                        <th>Início Vigência</th>
+                        <th>Fim Vigência</th>
+                        <th>Base Tarifária</th>
+                        <th>SubGrupo</th>
+                        <th>Modalidade</th>
+                        <th>Classe</th>
+                        <th>SubClasse</th>
+                        <th>Detalhe</th>
+                        <th>Posto Tarifário</th>
+                        <th>Unidade</th>
+                        <th class="highlight">Vlr TUSD</th>
+                        <th class="highlight">Vlr TE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if medicoes %}
+                        {% for medicao in medicoes %}
+                            <tr>
+                                <td>{{ medicao.DatGeracaoConjuntoDados }}</td>
+                                <td>{{ medicao.DscREH }}</td>
+                                <td>{{ medicao.SigAgente }}</td>
+                                <td>{{ medicao.NumCNPJDistribuidora }}</td>
+                                <td>{{ medicao.DatInicioVigencia }}</td>
+                                <td>{{ medicao.DatFimVigencia }}</td>
+                                <td>{{ medicao.DscBaseTarifaria }}</td>
+                                <td>{{ medicao.DscSubGrupo }}</td>
+                                <td>{{ medicao.DscModalidadeTarifaria }}</td>
+                                <td>{{ medicao.DscClasse }}</td>
+                                <td>{{ medicao.DscSubClasse }}</td>
+                                <td>{{ medicao.DscDetalhe }}</td>
+                                <td>{{ medicao.NomPostoTarifario }}</td>
+                                <td>{{ medicao.DscUnidadeTerciaria }}</td>
+                                <td class="highlight">{{ medicao.VlrTUSD }}</td>
+                                <td class="highlight">{{ medicao.VlrTE }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="16">Nenhum dado disponível.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
 
-        <span>Página {{ page }} de {{ total_pages }}</span>
+        <!-- 📄 Paginação -->
+        <div class="pagination">
+            {% if page > 1 %}
+                <a href="{{ url_for('medicoes_dashboard', page=1) }}" class="pagination-btn">« Primeira</a>
+                <a href="{{ url_for('medicoes_dashboard', page=page-1) }}" class="pagination-btn">‹ Anterior</a>
+            {% endif %}
 
-        {% if page < total_pages %}
-            <a href="{{ url_for('medicoes_dashboard', page=page+1) }}">Próxima</a>
-            <a href="{{ url_for('medicoes_dashboard', page=total_pages) }}">Última</a>
-        {% endif %}
+            <span>Página {{ page }} de {{ total_pages }}</span>
+
+            {% if page < total_pages %}
+                <a href="{{ url_for('medicoes_dashboard', page=page+1) }}" class="pagination-btn">Próxima ›</a>
+                <a href="{{ url_for('medicoes_dashboard', page=total_pages) }}" class="pagination-btn">Última »</a>
+            {% endif %}
+        </div>
     </div>
 </body>
 </html>
