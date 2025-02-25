@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Medições - ANEEL</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/medicoes_dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -12,23 +13,26 @@
         <h1>Dashboard de Medições - API ANEEL</h1>
         <a href="/" class="btn-home">Voltar para Home</a>
 
-        <!-- 🗂️ Filtros por Categorias -->
-        <form method="GET" action="{{ url_for('medicoes_dashboard') }}" class="filter-container">
-            {% for key, options in dropdown_options.items() %}
-                <div class="filter-group">
-                    <label for="{{ key }}">{{ key.replace('_', ' ') }}</label>
-                    <select id="{{ key }}" name="{{ key }}" onchange="this.form.submit()">
+        <div class="chart-container">
+            <canvas id="tarifaChart"></canvas>
+        </div>
+
+        <form method="GET" action="{{ url_for('medicoes_dashboard') }}" id="filterForm">
+            <div class="filters">
+                {% for key, options in dropdown_options.items() %}
+                    <label for="{{ key }}">{{ key }}</label>
+                    <select name="{{ key }}" id="{{ key }}">
                         {% for option in options %}
-                            <option value="{{ option }}" {% if filters[key] == option %}selected{% endif %}>
-                                {{ option }}
-                            </option>
+                            <option value="{{ option }}" {% if option == filters[key] %}selected{% endif %}>{{ option }}</option>
                         {% endfor %}
                     </select>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
+            <div class="filter-button">
+                <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+            </div>
         </form>
 
-        <!-- 📋 Tabela de Dados -->
         <div class="table-container">
             <table id="dataTable">
                 <thead>
@@ -80,7 +84,6 @@
             </table>
         </div>
 
-        <!-- 📄 Paginação -->
         <div class="pagination">
             {% if page > 1 %}
                 <a href="{{ url_for('medicoes_dashboard', page=1) }}" class="pagination-btn">« Primeira</a>
@@ -95,5 +98,63 @@
             {% endif %}
         </div>
     </div>
+
+    <script>
+        const ctx = document.getElementById('tarifaChart').getContext('2d');
+        const tarifaChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ anos|tojson }},
+                datasets: [
+                    {
+                        label: 'VLR TUSD (R$)',
+                        data: {{ vlr_tusd|tojson }},
+                        borderColor: '#003f7d',
+                        backgroundColor: 'rgba(0, 63, 125, 0.5)',
+                        borderWidth: 2,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'VLR TE (R$)',
+                        data: {{ vlr_te|tojson }},
+                        borderColor: '#ff6f00',
+                        backgroundColor: 'rgba(255, 111, 0, 0.5)',
+                        borderWidth: 2,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': R$ ' + context.raw.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Ano de Vigência'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Valor em Reais (R$)'
+                        },
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
