@@ -12,8 +12,6 @@ app = Flask(__name__)
 
 # 🔹 Configuração de segurança
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'uma_chave_super_secreta')
-
-# 🔹 Senha fixa definida no .env ou padrão
 SENHA_ACESSO = os.getenv('ACCESS_PASSWORD', 'senha_super_segura')
 
 # 🔹 Caminho do arquivo CSV
@@ -92,6 +90,7 @@ def medicoes_dashboard():
 
     return render_template('medicoes_dashboard.html', medicoes=medicoes, total_pages=total_pages, page=page,
                            dropdown_options=dropdown_options, filters=filters)
+
 
 # 🔹 Logout
 @app.route("/logout")

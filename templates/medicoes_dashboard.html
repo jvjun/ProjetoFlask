@@ -15,16 +15,16 @@
         <!-- 🗂️ Filtros por Categorias -->
         <form method="GET" action="{{ url_for('medicoes_dashboard') }}" class="filter-container">
             {% for key, options in dropdown_options.items() %}
-                    <div class="filter-group">
-                        <label for="{{ key }}">{{ key.replace('_', ' ') }}</label>
-                        <select id="{{ key }}" name="{{ key }}" onchange="this.form.submit()">
-                            {% for option in options %}
-                                <option value="{{ option }}" {% if filters[key] == option %}selected{% endif %}>
-                                    {{ option }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                <div class="filter-group">
+                    <label for="{{ key }}">{{ key.replace('_', ' ') }}</label>
+                    <select id="{{ key }}" name="{{ key }}" onchange="this.form.submit()">
+                        {% for option in options %}
+                            <option value="{{ option }}" {% if filters[key] == option %}selected{% endif %}>
+                                {{ option }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
             {% endfor %}
         </form>
 
@@ -33,7 +33,6 @@
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <th>Data Geração</th>
                         <th>Resolução</th>
                         <th>Agente</th>
                         <th>CNPJ</th>
@@ -55,7 +54,6 @@
                     {% if medicoes %}
                         {% for medicao in medicoes %}
                             <tr>
-                                <td>{{ medicao.DatGeracaoConjuntoDados }}</td>
                                 <td>{{ medicao.DscREH }}</td>
                                 <td>{{ medicao.SigAgente }}</td>
                                 <td>{{ medicao.NumCNPJDistribuidora }}</td>
@@ -75,7 +73,7 @@
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="16">Nenhum dado disponível.</td>
+                            <td colspan="15">Nenhum dado disponível.</td>
                         </tr>
                     {% endif %}
                 </tbody>
